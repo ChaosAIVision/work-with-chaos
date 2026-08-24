@@ -14,7 +14,7 @@ One protocol for every task, in every project, every size. The human manages; th
 | Phase | Code files (`Edit`/`Write` on source) | What findings become |
 |---|---|---|
 | 1 Plan, 2 Research, 3 Decide, 4 Tickets | **Forbidden. No exceptions.** | A **Candidate Finding** in the Decision Report or a new ticket |
-| 5 Implement | Allowed **only** on the frontier ticket's files | The change itself + tests |
+| 5 Implement | Allowed **only** after the **Approval Gate** (end of phase 4), and only on the frontier ticket's files | The change itself + tests |
 | 6 Review, 7 Report | Forbidden (review reports; it doesn't repair) | A finding in the review output → new ticket |
 | No `STATUS.md`, no locked phase | Forbidden | Nothing gets touched — write the `STATUS.md` first |
 
@@ -35,10 +35,10 @@ A skill referenced below is invoked through the Skill tool, which only works for
 
 ## Phase 0 — Orient (every session start)
 
-1. Read the target repo's `STATUS.md` (create it if absent — template below). It holds: current phase, active task, **Stalled** tasks with their missing inputs, open decisions.
-2. If `STATUS.md` shows work in flight → resume that phase, under Phase Discipline above. If the session starts clean → Phase 1.
+1. Read the target repo's `STATUS.md` (create it if absent — template below). It holds: current phase, active task, **Stalled** tasks with their missing inputs, open decisions, plan approval.
+2. If `STATUS.md` shows work in flight → resume that phase, under Phase Discipline above. A file showing phase 5 without `Plan approved:` set is actually at phase 4 behind the Approval Gate — present the package, don't resume the edits. If the session starts clean → Phase 1.
 
-`STATUS.md` is the only routing source. Never ask the human "where were we?" — that question is what this file exists to answer. It is also the only thing that unlocks code edits: no `STATUS.md` at phase 5, no `Edit`/`Write` on source files.
+`STATUS.md` is the only routing source. Never ask the human "where were we?" — that question is what this file exists to answer. It is also the only thing that unlocks code edits: no `STATUS.md` at phase 5 *with the Approval Gate passed*, no `Edit`/`Write` on source files.
 
 ## Phase 1 — Plan
 
@@ -77,9 +77,11 @@ Input = before, Output = after, both as code locations. Code-anchored Input/Outp
 
 Order by the domino checklist, top-down; the first discriminating rule decides. Each accepted Candidate Finding becomes a ticket here before anything touches it.
 
+**Approval Gate (4 → 5).** Tickets end the plan; they don't start the build. Present the whole package to the human in one pass — one line per locked ADR, the full ticket list in domino order, the `QUALITY-CONTRACT.md` thresholds — then one AskUserQuestion: approve and enter phase 5, or revise. Until `STATUS.md` records `Plan approved: <date>`, phase stays 4 and the only permitted work is revising the plan. The per-axis clicks of phase 3 closed decisions; they are not approval of the plan as a whole. No ticket starts and `input-gate` passes nothing until this gate is passed.
+
 ## Phase 5 — Implement
 
-1. Run `input-gate` on the frontier ticket. Stalled → park it in `STATUS.md`, offer a `wizard` for the human-only step, move to the next ticket. The block never waits.
+1. Precondition: the Approval Gate has passed — `STATUS.md` shows `Plan approved: <date>`. If it doesn't, the work is at phase 4, not here. Then run `input-gate` on the frontier ticket. Stalled → park it in `STATUS.md`, offer a `wizard` for the human-only step, move to the next ticket. The block never waits.
 2. **Scope check before the first edit**: the files this ticket names are the files you may edit. A defect found mid-implementation *outside* that scope is a Candidate Finding for the next ticket — not a detour. (Inside scope: fix it, it's why the ticket exists.)
 3. Implement in the `implement` style (user-only command — inlined; run `/implement` for the full original): /tdd at pre-agreed seams, regular typechecks, full suite at the end.
 4. In parallel: a background agent hunts edge cases against the *current* ticket; findings feed the *next* ticket's test cases, never the running one.
@@ -106,6 +108,7 @@ The glossary lives in this repo's `CONTEXT.md` — Work Block, Stalled Task, Inp
 
 Phase: <1-7 or in-flight note>
 Active: <ticket or task>
+Plan approved: <date> | — (phase 5 locked until the Approval Gate passes)
 
 ## Stalled
 - <ticket> — missing <input> — unblocked by <human action>

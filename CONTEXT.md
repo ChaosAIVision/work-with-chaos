@@ -32,6 +32,10 @@ _Avoid_: Input = "điều kiện cần", Output = "deliverable mô tả bằng l
 Defect phát hiện thấy ở phase không phải Implement (research, verify, review): ghi lại `file:line` + hiện tượng + bằng chứng + fix đề xuất — vào Decision Report hoặc ticket. Không sửa trực tiếp; sửa ở phase 5 theo ticket.
 _Avoid_: quick fix, drive-by fix
 
+**Approval Gate**:
+Cổng bắt buộc giữa phase Tickets và phase Implement: trình trọn gói (mỗi ADR đã chốt một dòng + toàn bộ ticket theo thứ tự domino + ngưỡng quality contract) trong một AskUserQuestion duyệt đúng một lần. `STATUS.md` ghi `Plan approved: <date>` thì phase 5 mới mở; chưa duyệt thì việc duy nhất được làm là sửa plan. Click chốt từng trục ở phase Decide là chốt *quyết định*, không phải duyệt *plan*.
+_Avoid_: coi từng câu hỏi phase Decide là đã duyệt tổng thể, "review cuối" tự hiểu
+
 **Breadth-Plan**:
 Lớp kế hoạch mỏng phủ mọi project trong một buổi: chỉ đủ sâu để xếp thứ tự các Work Block và phát hiện project nào thiếu input.
 _Avoid_: master plan, big plan

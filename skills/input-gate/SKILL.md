@@ -18,6 +18,7 @@ Runs at the top of every implement work block, before any code is written. For e
 | Environment | Target env reachable (DB ping, API health, deploy target answers) |
 | Access | The account in play can actually perform the ticket's actions |
 | Decisions | Every open decision the ticket depends on has an ADR or a locked contract behind it |
+| Plan approval | `STATUS.md` shows `Plan approved: <date>` (the Approval Gate, ADR-0004) — per-axis phase-3 clicks don't count; no approval means the whole plan is still at phase 4 |
 
 Verify by *doing*, not by assuming: a `SELECT 1` against the real DB, a `curl` to the real endpoint. A check that only confirms the file exists is half a check.
 
