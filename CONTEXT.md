@@ -24,6 +24,10 @@ _Avoid_: save point
 
 ### Lập kế hoạch & kỷ luật phase
 
+**Ticket Input/Output**:
+Output của phase Tickets phải neo vào code, không phải mô tả trừu tượng. **Input** = `file` + `function/class` xuất phát + hành vi hiện tại một dòng (logic bị thay đổi, nằm ở đâu *hôm nay*). **Output** = cùng anchor đó *sau* khi đổi: hàm/file nào thêm/sửa/xóa, signature mới, hành vi mới một dòng. Input là before, Output là after. Thông tin "phải có gì trước khi bắt đầu" (credential, data, ADR) là **Gate inputs** của `input-gate`, không lẫn vào Input/Output.
+_Avoid_: Input = "điều kiện cần", Output = "deliverable mô tả bằng lời"
+
 **Candidate Finding**:
 Defect phát hiện thấy ở phase không phải Implement (research, verify, review): ghi lại `file:line` + hiện tượng + bằng chứng + fix đề xuất — vào Decision Report hoặc ticket. Không sửa trực tiếp; sửa ở phase 5 theo ticket.
 _Avoid_: quick fix, drive-by fix

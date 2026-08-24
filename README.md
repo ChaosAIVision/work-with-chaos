@@ -25,7 +25,7 @@ The fix isn't more discipline. It's a protocol: the human manages, the AI works 
 2 Research  → codebase scan + primary sources, in parallel; benchmark what compares
 3 Decide    → six-axis sweep (architecture · performance · database · api · security · test),
               one question per genuinely open axis; lock the Quality Contract
-4 Tickets   → tracer-bullet slices with Input / Output / Quality gate / Domino note
+4 Tickets   → tracer-bullet slices with code-anchored Input / Output (function before → function after), Gate inputs, Quality gate, Domino note
 5 Implement → input gate → TDD, background edge-case hunt → checkpoint per ticket
 6 Review    → standards + spec + performance-vs-contract, in parallel
 7 Report    → delivery report: end-to-end flow + per-module IO table + unverified-claims list

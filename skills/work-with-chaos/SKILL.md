@@ -56,12 +56,15 @@ The `decide` skill: sweep the six axes (architecture · performance · database 
 
 ## Phase 4 — Tickets
 
-The `to-tickets` skill, extended: each ticket keeps the local-file convention (`.scratch/<slug>/issues/NN-*.md`, blockers first) plus four fields —
+The `to-tickets` skill, extended: each ticket keeps the local-file convention (`.scratch/<slug>/issues/NN-*.md`, blockers first) plus five fields —
 
-- **Input** — what must exist before starting (feeds `input-gate`)
-- **Output** — the verifiable artifact the ticket delivers
+- **Input** — a **code anchor**: `file` + `function/class` this ticket starts from, and its current behavior in one line — the logic being changed, where it lives *today*. Not "what must exist" in the abstract; that's the pipeline's job. A ticket starts from code, or from the empty file it will create.
+- **Output** — the same anchors *after* the change: which functions/files are added, modified, or deleted — new signature + one line of new behavior. The code is the artifact; name it. Bad: "swap detection source to ABBOTT API". Good: "`_check_ra_shop()` (`scripts/run_batch_async.py`) → GET `{ABBOTT_API_BASE}/api/ai-qc/intraday/records?callId=`; `_ra_shop_api_target` + 3rd-party path deleted."
+- **Gate inputs** — the checkable externals `input-gate` verifies before phase 5 (credentials, data, env, access, a verified API, an accepted ADR). Lives here — never mixed into Input/Output.
 - **Quality gate** — the contract thresholds + evidence label (🟢/🟡/🔴/⚫) this ticket must meet
 - **Domino Note** — why this ticket sits at this position (`${CLAUDE_SKILL_DIR}/domino-checklist.md`)
+
+Input = before, Output = after, both as code locations. Code-anchored Input/Output is what makes phase 5's scope check enforceable: "the functions this ticket's Output names" is matchable; "swap the detection source" is not.
 
 Order by the domino checklist, top-down; the first discriminating rule decides. Each accepted Candidate Finding becomes a ticket here before anything touches it.
 
