@@ -7,12 +7,32 @@ description: The master workflow for starting or resuming any piece of work in a
 
 One protocol for every task, in every project, every size. The human manages; the AI works the pipeline. Consistency is the product — a fast lane would reintroduce the judgement calls this protocol exists to remove.
 
+## Phase Discipline (read this before anything else)
+
+**The phase in `STATUS.md` decides what you may touch. Not your judgement. Not the size of the fix.**
+
+| Phase | Code files (`Edit`/`Write` on source) | What findings become |
+|---|---|---|
+| 1 Plan, 2 Research, 3 Decide, 4 Tickets | **Forbidden. No exceptions.** | A **Candidate Finding** in the Decision Report or a new ticket |
+| 5 Implement | Allowed **only** on the frontier ticket's files | The change itself + tests |
+| 6 Review, 7 Report | Forbidden (review reports; it doesn't repair) | A finding in the review output → new ticket |
+| No `STATUS.md`, no locked phase | Forbidden | Nothing gets touched — write the `STATUS.md` first |
+
+Rules that make this hold:
+
+1. **Planning is the work.** A fix applied during research destroys the plan it was supposed to feed: the Decision Report no longer describes reality, tickets are written against a codebase that silently changed, and the human approved a plan that no longer exists. An un-fixed bug you can see costs minutes; a corrupted decision trail costs the whole pipeline.
+2. **There is no "small fix" exemption.** A one-line signature change *is* an implementation decision — it has a caller, a test, and a place in the Decision Report. "It's just one line" is exactly how a session slides from research into unreviewed implementation, edit after edit, without anyone choosing to.
+3. **Findings, not fixes.** When research or verification surfaces a defect (wrong signature, dead call, broken import), record it as a **Candidate Finding**: file:line, what's wrong, evidence, proposed fix. File it in the Decision Report (phase 2–3) or as a ticket (phase 4+). The fix happens in phase 5 against a ticket, with tests, at a Checkpoint — or it doesn't happen this cycle.
+4. **Verify read-only.** Running tests, grepping, reading files, measuring — always allowed, every phase. These are how findings get their evidence labels. The moment verification tempts an edit, that temptation is the finding.
+5. **If you already edited in the wrong phase: revert, then record.** Undo the edit, put the Candidate Finding where it belongs, and say so in `STATUS.md`. Do not keep the edit because "it was right" — the process violation is the defect now.
+6. **When the human says fix it now, that's a phase change.** Update `STATUS.md` to phase 5 with that ticket first. One line, then implement. The protocol doesn't block the human — it blocks *drift*.
+
 ## Phase 0 — Orient (every session start)
 
 1. Read the target repo's `STATUS.md` (create it if absent — template below). It holds: current phase, active task, **Stalled** tasks with their missing inputs, open decisions.
-2. If `STATUS.md` shows work in flight → resume that phase. If the session starts clean → Phase 1.
+2. If `STATUS.md` shows work in flight → resume that phase, under Phase Discipline above. If the session starts clean → Phase 1.
 
-`STATUS.md` is the only routing source. Never ask the human "where were we?" — that question is what this file exists to answer.
+`STATUS.md` is the only routing source. Never ask the human "where were we?" — that question is what this file exists to answer. It is also the only thing that unlocks code edits: no `STATUS.md` at phase 5, no `Edit`/`Write` on source files.
 
 ## Phase 1 — Plan
 
@@ -28,11 +48,11 @@ Two background agents in parallel (dispatch both, keep working):
 - **Inside agent** — scans the existing codebase: current patterns, dependencies, constraints, prior art.
 - **Outside agent** — the `research` skill: primary sources only.
 
-Then the `benchmark` skill turns comparisons into labeled evidence. Output: a **Decision Report** (`report` skill, Decision form) — options, trade-offs, evidence table, open choices.
+Then the `benchmark` skill turns comparisons into labeled evidence. Output: a **Decision Report** (`report` skill, Decision form) — options, trade-offs, evidence table, open choices, **Candidate Findings** (defects seen while scanning, recorded — not fixed — per Phase Discipline).
 
 ## Phase 3 — Decide
 
-The `decide` skill: sweep the six axes (architecture · performance · database · api · security · test), one AskUserQuestion per *genuinely open* axis — settled axes get one line citing their ADR, not a question. Lock `QUALITY-CONTRACT.md` here if not yet locked. Decisions land in `docs/adr/` per the `domain-modeling` skill.
+The `decide` skill: sweep the six axes (architecture · performance · database · api · security · test), one AskUserQuestion per *genuinely open* axis — settled axes get one line citing their ADR, not a question. Lock `QUALITY-CONTRACT.md` here if not yet locked. Decisions land in `docs/adr/` per the `domain-modeling` skill. Candidate Findings get triaged here: fix-in-phase-5 (becomes a ticket), defer, or reject — one decision each.
 
 ## Phase 4 — Tickets
 
@@ -43,18 +63,21 @@ The `to-tickets` skill, extended: each ticket keeps the local-file convention (`
 - **Quality gate** — the contract thresholds + evidence label (🟢/🟡/🔴/⚫) this ticket must meet
 - **Domino Note** — why this ticket sits at this position (`${CLAUDE_SKILL_DIR}/domino-checklist.md`)
 
-Order by the domino checklist, top-down; the first discriminating rule decides.
+Order by the domino checklist, top-down; the first discriminating rule decides. Each accepted Candidate Finding becomes a ticket here before anything touches it.
 
 ## Phase 5 — Implement
 
 1. Run `input-gate` on the frontier ticket. Stalled → park it in `STATUS.md`, offer a `wizard` for the human-only step, move to the next ticket. The block never waits.
-2. Implement per the `implement` skill (/tdd at pre-agreed seams, regular typechecks, full suite at the end).
-3. In parallel: a background agent hunts edge cases against the *current* ticket; findings feed the *next* ticket's test cases, never the running one.
-4. **Checkpoint** at each ticket's end: commit + tick the ticket's acceptance criteria + update `STATUS.md`.
+2. **Scope check before the first edit**: the files this ticket names are the files you may edit. A defect found mid-implementation *outside* that scope is a Candidate Finding for the next ticket — not a detour. (Inside scope: fix it, it's why the ticket exists.)
+3. Implement per the `implement` skill (/tdd at pre-agreed seams, regular typechecks, full suite at the end).
+4. In parallel: a background agent hunts edge cases against the *current* ticket; findings feed the *next* ticket's test cases, never the running one.
+5. **Checkpoint** at each ticket's end: commit + tick the ticket's acceptance criteria + update `STATUS.md`. Scope ends at the Checkpoint: new findings after it wait for the next ticket, including "obvious" cleanups.
 
 ## Phase 6 — Review
 
 The `code-review` skill (two axes, as-is), plus one added sub-agent: performance vs `QUALITY-CONTRACT.md` and edge-case/error-handling sweep. Unlabeled performance numbers found in code or docs count as findings.
+
+Review is read-only. Every defect it finds — including one-line fixes — is reported as a finding with file:line and goes back through tickets. Review that repairs is review that grades its own homework.
 
 ## Phase 7 — Report
 
@@ -62,7 +85,7 @@ At milestone or `/report`: the `report` skill, Delivery form — end-to-end flow
 
 ## Vocabulary
 
-The glossary lives in this repo's `CONTEXT.md` — Work Block, Stalled Task, Input Gate, Checkpoint, Breadth-Plan, Deep-Plan, Domino Note, Quality Contract, Evidence Ladder, Decision Report, Delivery Report. Use these terms; don't rename them mid-flight.
+The glossary lives in this repo's `CONTEXT.md` — Work Block, Stalled Task, Input Gate, Checkpoint, Breadth-Plan, Deep-Plan, Domino Note, Quality Contract, Evidence Ladder, Candidate Finding, Decision Report, Delivery Report. Use these terms; don't rename them mid-flight.
 
 ## STATUS.md template
 
@@ -77,4 +100,7 @@ Active: <ticket or task>
 
 ## Open decisions
 - <axis>: <what's unresolved>
+
+## Candidate Findings
+- <file:line> — <defect + evidence> — <proposed fix> — <triage: ticket / defer / reject>
 ```

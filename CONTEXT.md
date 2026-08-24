@@ -22,7 +22,11 @@ _Avoid_: pre-check, checklist đầu block
 Điểm lưu trạng thái khi kết thúc một task: commit + tick acceptance criteria trong ticket + handoff doc nếu hết block.
 _Avoid_: save point
 
-### Lập kế hoạch
+### Lập kế hoạch & kỷ luật phase
+
+**Candidate Finding**:
+Defect phát hiện thấy ở phase không phải Implement (research, verify, review): ghi lại `file:line` + hiện tượng + bằng chứng + fix đề xuất — vào Decision Report hoặc ticket. Không sửa trực tiếp; sửa ở phase 5 theo ticket.
+_Avoid_: quick fix, drive-by fix
 
 **Breadth-Plan**:
 Lớp kế hoạch mỏng phủ mọi project trong một buổi: chỉ đủ sâu để xếp thứ tự các Work Block và phát hiện project nào thiếu input.

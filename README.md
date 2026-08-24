@@ -14,6 +14,7 @@ The fix isn't more discipline. It's a protocol: the human manages, the AI works 
 | Session dies mid-task on a missing credential | Input gate checks *before* work starts; stalled tasks park, sessions move on |
 | "AI recommended a query" — 5s, one index away from 400ms | Every performance claim carries an evidence label; unlabeled numbers are defects |
 | Requirements unclear → build → feedback → rebuild | Decisions close up front: six-axis sweep, one click per open question |
+| Agent slides from research into unrequested code edits | Phase discipline: edits only in phase 5 on the frontier ticket; other phases file Candidate Findings ([ADR-0003](docs/adr/0003-plan-first-no-edits-outside-implement.md)) |
 | Plans go stale before implementation | Two-layer planning: thin breadth-plan for the day, deep-plan per project right before its block |
 
 ## The pipeline
@@ -54,7 +55,7 @@ The script is idempotent — re-run after every pull. It never touches a real fo
 
 | Skill | What it does |
 |---|---|
-| `work-with-chaos` | The orchestrator: seven phases, `STATUS.md` routing, two-layer planning |
+| `work-with-chaos` | The orchestrator: seven phases, `STATUS.md` routing, two-layer planning, phase discipline (code edits only in phase 5; everything else files Candidate Findings) |
 | `benchmark` | The evidence ladder — 🟢 measured · 🟡 sandbox · 🔴 cited · ⚫ unverified — and the sandbox method behind 🟡 |
 | `decide` | Six-axis sweep; one AskUserQuestion per open axis; ADRs and the Quality Contract lock |
 | `input-gate` | Credentials/data/env/access/decisions verified *by doing* before work starts; `BLOCKED.md` + wizard for what only a human can clear |
