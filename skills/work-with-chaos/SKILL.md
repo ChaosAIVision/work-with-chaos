@@ -27,6 +27,12 @@ Rules that make this hold:
 5. **If you already edited in the wrong phase: revert, then record.** Undo the edit, put the Candidate Finding where it belongs, and say so in `STATUS.md`. Do not keep the edit because "it was right" — the process violation is the defect now.
 6. **When the human says fix it now, that's a phase change.** Update `STATUS.md` to phase 5 with that ticket first. One line, then implement. The protocol doesn't block the human — it blocks *drift*.
 
+## Skill wiring — what the AI can and cannot call
+
+A skill referenced below is invoked through the Skill tool, which only works for **model-invocable** skills. Of the matt-pocock set, `research`, `grilling`, `domain-modeling`, `code-review`, `tdd`, `wizard` are model-invocable — the AI calls them on its own when the phase says so. The rest (`to-tickets`, `implement`, `handoff`, `grill-me`, `grill-with-docs`, `to-spec`, `teach`, …) are user-only slash commands (`disable-model-invocation: true`): **the AI cannot call them, ever.** Where a phase leans on one, its behavior is inlined in the phase text and the name is attribution, not an invocation. For the full original, the human runs the slash command.
+
+`grill-with-docs` is the composition `grilling` + `domain-modeling` — both invocable — so the pipeline reproduces it inline where it belongs instead of calling a command it can't.
+
 ## Phase 0 — Orient (every session start)
 
 1. Read the target repo's `STATUS.md` (create it if absent — template below). It holds: current phase, active task, **Stalled** tasks with their missing inputs, open decisions.
@@ -52,11 +58,14 @@ Then the `benchmark` skill turns comparisons into labeled evidence. Output: a **
 
 ## Phase 3 — Decide
 
-The `decide` skill: sweep the six axes (architecture · performance · database · api · security · test), one AskUserQuestion per *genuinely open* axis — settled axes get one line citing their ADR, not a question. Lock `QUALITY-CONTRACT.md` here if not yet locked. Decisions land in `docs/adr/` per the `domain-modeling` skill. Candidate Findings get triaged here: fix-in-phase-5 (becomes a ticket), defer, or reject — one decision each.
+Two instruments, in order:
+
+1. **Grill first** — the `grilling` skill (model-invocable): interview the human in frontier rounds over the Decision Report — every open decision, numbered questions, recommended answer each. The `decide` skill's six-axis sweep is the *map* of what to grill; grilling is how each genuinely open axis gets closed. Where an ADR or glossary entry crystallizes mid-grill, write it per `domain-modeling` as you go (this is `grill-with-docs` inlined — its parts are invocable even though the command isn't).
+2. **Then lock** — the `decide` skill: settle anything grilling left as clicks (one AskUserQuestion per remaining open axis — settled axes get one line citing their ADR, not a question). Lock `QUALITY-CONTRACT.md` here if not yet locked. Decisions land in `docs/adr/` per the `domain-modeling` skill. Candidate Findings get triaged here: fix-in-phase-5 (becomes a ticket), defer, or reject — one decision each.
 
 ## Phase 4 — Tickets
 
-The `to-tickets` skill, extended: each ticket keeps the local-file convention (`.scratch/<slug>/issues/NN-*.md`, blockers first) plus five fields —
+Ticket format follows `to-tickets` (user-only command — behavior inlined here; run `/to-tickets` for the full original): each ticket keeps the local-file convention (`.scratch/<slug>/issues/NN-*.md`, blockers first) plus five fields —
 
 - **Input** — a **code anchor**: `file` + `function/class` this ticket starts from, and its current behavior in one line — the logic being changed, where it lives *today*. Not "what must exist" in the abstract; that's the pipeline's job. A ticket starts from code, or from the empty file it will create.
 - **Output** — the same anchors *after* the change: which functions/files are added, modified, or deleted — new signature + one line of new behavior. The code is the artifact; name it. Bad: "swap detection source to ABBOTT API". Good: "`_check_ra_shop()` (`scripts/run_batch_async.py`) → GET `{ABBOTT_API_BASE}/api/ai-qc/intraday/records?callId=`; `_ra_shop_api_target` + 3rd-party path deleted."
@@ -72,7 +81,7 @@ Order by the domino checklist, top-down; the first discriminating rule decides. 
 
 1. Run `input-gate` on the frontier ticket. Stalled → park it in `STATUS.md`, offer a `wizard` for the human-only step, move to the next ticket. The block never waits.
 2. **Scope check before the first edit**: the files this ticket names are the files you may edit. A defect found mid-implementation *outside* that scope is a Candidate Finding for the next ticket — not a detour. (Inside scope: fix it, it's why the ticket exists.)
-3. Implement per the `implement` skill (/tdd at pre-agreed seams, regular typechecks, full suite at the end).
+3. Implement in the `implement` style (user-only command — inlined; run `/implement` for the full original): /tdd at pre-agreed seams, regular typechecks, full suite at the end.
 4. In parallel: a background agent hunts edge cases against the *current* ticket; findings feed the *next* ticket's test cases, never the running one.
 5. **Checkpoint** at each ticket's end: commit + tick the ticket's acceptance criteria + update `STATUS.md`. Scope ends at the Checkpoint: new findings after it wait for the next ticket, including "obvious" cleanups.
 
@@ -84,7 +93,7 @@ Review is read-only. Every defect it finds — including one-line fixes — is r
 
 ## Phase 7 — Report
 
-At milestone or `/report`: the `report` skill, Delivery form — end-to-end flow + per-module table (Task → Module → Interfaces → Tests → Architecture rules honored), plus the plain **Unverified claims** list. Update `STATUS.md`; if the block ends, write a `handoff` doc.
+At milestone or `/report`: the `report` skill, Delivery form — end-to-end flow + per-module table (Task → Module → Interfaces → Tests → Architecture rules honored), plus the plain **Unverified claims** list. Update `STATUS.md`; if the block ends, write a handoff in the `handoff` style (user-only command — inlined; run `/handoff` for the full original).
 
 ## Vocabulary
 
