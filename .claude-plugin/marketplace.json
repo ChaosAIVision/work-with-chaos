@@ -1,11 +1,14 @@
 {
   "name": "work-with-chaos",
-  "owner": "chaos",
+  "owner": {
+    "name": "Chaos",
+    "url": "https://github.com/ChaosAIVision"
+  },
   "plugins": [
     {
       "name": "work-with-chaos",
       "source": "./",
-      "description": "One fixed pipeline for every task: research with labeled evidence, fast decisions, anti-stall input gate, delivery reports."
+      "description": "One pipeline for every task: research with labeled evidence, fast decisions, anti-stall input gate, delivery reports."
     }
   ]
 }

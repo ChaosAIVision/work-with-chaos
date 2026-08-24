@@ -27,4 +27,4 @@ Six axes, checked per decision point — **architecture · performance · databa
 
 ## Quality Contract
 
-When `QUALITY-CONTRACT.md` doesn't exist yet in the target repo: seed it from the per-stack template (`${CLAUDE_SKILL_DIR}/../../references/quality-contract-template.md` in this repo), fill concrete thresholds from *labeled* benchmark evidence, then lock it with the human in one AskUserQuestion pass during Deep-Plan. One lock, then the contract judges — during research the thresholds are proposals, and a proposal may never present itself as a verdict.
+When `QUALITY-CONTRACT.md` doesn't exist yet in the target repo: seed it from the per-stack template (`${CLAUDE_SKILL_DIR}/quality-contract-template.md` in the work-with-chaos skill folder), fill concrete thresholds from *labeled* benchmark evidence, then lock it with the human in one AskUserQuestion pass during Deep-Plan. One lock, then the contract judges — during research the thresholds are proposals, and a proposal may never present itself as a verdict.

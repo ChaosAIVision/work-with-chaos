@@ -41,7 +41,7 @@ The `to-tickets` skill, extended: each ticket keeps the local-file convention (`
 - **Input** — what must exist before starting (feeds `input-gate`)
 - **Output** — the verifiable artifact the ticket delivers
 - **Quality gate** — the contract thresholds + evidence label (🟢/🟡/🔴/⚫) this ticket must meet
-- **Domino Note** — why this ticket sits at this position (`${CLAUDE_SKILL_DIR}/../../references/domino-checklist.md`)
+- **Domino Note** — why this ticket sits at this position (`${CLAUDE_SKILL_DIR}/domino-checklist.md`)
 
 Order by the domino checklist, top-down; the first discriminating rule decides.
 

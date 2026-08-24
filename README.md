@@ -82,18 +82,18 @@ A number found without a label is a defect, treated like a failing test.
 ## Repository layout
 
 ```
-.claude-plugin/marketplace.json          this repo is its own marketplace
-.claude-plugin/plugin.json               plugin identity
-skills/work-with-chaos/SKILL.md          the orchestrator
-skills/benchmark/SKILL.md                evidence ladder + sandbox method
-skills/decide/SKILL.md                   six-axis sweep, contract lock, ADRs
-skills/input-gate/SKILL.md               the anti-stall gate
-skills/report/SKILL.md                   decision + delivery report forms
-references/domino-checklist.md           ticket ordering (CHIA–CHỌN–CHUỖI, timvu.vn/fast)
-references/quality-contract-template.md  per-stack threshold seeds
-scripts/setup-symlinks.sh                fallback installer
-CONTEXT.md                               the vocabulary
-docs/adr/                                decisions worth remembering
+.claude-plugin/marketplace.json              this repo is its own marketplace
+.claude-plugin/plugin.json                   plugin identity
+skills/work-with-chaos/SKILL.md              the orchestrator
+skills/work-with-chaos/domino-checklist.md   ticket ordering (CHIA–CHỌN–CHUỖI, timvu.vn/fast)
+skills/work-with-chaos/quality-contract-template.md  per-stack threshold seeds
+skills/benchmark/SKILL.md                    evidence ladder + sandbox method
+skills/decide/SKILL.md                       six-axis sweep, contract lock, ADRs
+skills/input-gate/SKILL.md                   the anti-stall gate
+skills/report/SKILL.md                       decision + delivery report forms
+scripts/setup-symlinks.sh                    fallback installer
+CONTEXT.md                                   the vocabulary
+docs/adr/                                    decisions worth remembering
 ```
 
 ## Vocabulary
