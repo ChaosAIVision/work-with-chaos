@@ -1,0 +1,4 @@
+interface:
+  display_name: "Work With Chaos Subagent"
+  short_description: "Delegate clear tasks and verify integrated outcomes"
+  default_prompt: "Use $work-with-chaos-subagent to build a clear plan, delegate independent tasks, and verify the integrated result."

@@ -1,7 +1,11 @@
 # ADR-0005: Two top-level skills in chaos-skill
 
 Date: 2026-09-17
-Status: Accepted
+Status: Accepted; the two-skill limit and installer list are superseded by [ADR-0007](0007-subagent-workflow.md).
+
+## Supersession
+
+The decision below records the original two-skill packaging. ADR-0007 adds work-with-chaos-subagent as a third entrypoint and includes it in the installer, superseding the exact-two restriction. The collection name, internal helper layout, installer preservation rules, and independent disk diagnosis workflow remain in effect.
 
 ## Context
 

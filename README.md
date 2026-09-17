@@ -1,19 +1,26 @@
 # chaos-skill
 
-A personal collection of two skills for working with AI.
+A personal collection of three skills for working with AI.
 
 | Skill | Purpose |
 | --- | --- |
 | [work-with-chaos](skills/work-with-chaos/SKILL.md) | Run a structured workflow from planning and research through decisions, implementation, review, and reporting. |
+| [work-with-chaos-subagent](skills/work-with-chaos-subagent/SKILL.md) | Extend work-with-chaos with an explicit delegation plan, independent subagent tasks, and coordinator-owned integration and acceptance. |
 | [diagnose-linux-disk](skills/diagnose-linux-disk/SKILL.md) | Reconcile Linux disk usage: df versus du, Docker storage, open deleted files, covered mounts, and filesystem accounting. |
 
-## The two skills
+## The three skills
 
 ### work-with-chaos
 
 Turn requirements into deliverable tasks with stable IDs, code anchors, real dependencies, and observable completion evidence. A canonical plan records scope and acceptance; STATUS.md records the active phase, revision, approval, and next action. The workflow preserves ordered steps, revalidates affected tasks when requirements change, and keeps implementation behind explicit plan approval.
 
 Read the [planning guide](skills/work-with-chaos/references/planning.md), [plan template](skills/work-with-chaos/references/plan-template.md), [workflow overview](docs/work-with-chaos.md), or [design decisions](docs/adr/). Benchmark, decide, input-gate, and report remain internal guides. External matt-pocock integrations can be used when installed; the bundled procedures also work without them.
+
+### work-with-chaos-subagent
+
+Use one coordinator to turn an explicit plan into bounded subagent assignments. Each task names its outcome, requirement IDs, dependencies, file and shared-resource ownership, interface contracts, and verification. Dispatch only ready tasks with disjoint ownership; the coordinator integrates their results and verifies final acceptance against the original requirements.
+
+Read the [entrypoint](skills/work-with-chaos-subagent/SKILL.md) and [dispatch template](skills/work-with-chaos-subagent/references/dispatch-template.md). This skill requires work-with-chaos as its base and preserves its phase discipline, plan approval, and evidence rules. Keep both workflow skill folders installed together.
 
 ### diagnose-linux-disk
 
@@ -32,10 +39,11 @@ claude plugin marketplace add ChaosAIVision/work-with-chaos
 claude plugin install chaos-skill@chaos-skill --scope user
 ```
 
-Invoke either skill:
+Invoke any of the three skills:
 
 ```text
 /chaos-skill:work-with-chaos
+/chaos-skill:work-with-chaos-subagent
 /chaos-skill:diagnose-linux-disk
 ```
 
@@ -46,22 +54,23 @@ git clone https://github.com/ChaosAIVision/work-with-chaos.git chaos-skill
 ./chaos-skill/scripts/setup-symlinks.sh
 ```
 
-The installer creates /work-with-chaos and /diagnose-linux-disk. It preserves real directories, can be rerun after pulling changes, and removes obsolete helper symlinks only when they point into this checkout. Set CHAOS_SKILLS_TARGET_DIR to choose a different installation directory.
+The installer creates /work-with-chaos, /work-with-chaos-subagent, and /diagnose-linux-disk. It preserves real directories, can be rerun after pulling changes, and removes obsolete helper symlinks only when they point into this checkout. Set CHAOS_SKILLS_TARGET_DIR to choose a different installation directory.
 
-Each folder under skills/ contains its own SKILL.md and resources and can also be used with a compatible skill loader.
+Each folder under skills/ contains its own SKILL.md and resources and can also be used with a compatible skill loader. When copying folders manually, install work-with-chaos-subagent and work-with-chaos together as sibling directories: the subagent skill reads ../work-with-chaos/SKILL.md. The base workflow and diagnose-linux-disk can each be installed independently.
 
 ## Upgrading from the previous layout
 
 The old collection exposed benchmark, decide, input-gate, and report as separate skills. Their instructions now live under work-with-chaos/references/; request those modes through work-with-chaos.
 
-For a previous plugin installation, switch from work-with-chaos@work-with-chaos to chaos-skill@chaos-skill. For the symlink installation, rerun scripts/setup-symlinks.sh from the updated checkout. See [ADR-0005](docs/adr/0005-two-top-level-skills.md) for the packaging decision.
+For a previous plugin installation, switch from work-with-chaos@work-with-chaos to chaos-skill@chaos-skill. For the symlink installation, rerun scripts/setup-symlinks.sh from the updated checkout. See [ADR-0005](docs/adr/0005-two-top-level-skills.md) for the original packaging decision and [ADR-0007](docs/adr/0007-subagent-workflow.md) for the third skill and its base dependency.
 
 ## Layout
 
 | Path | Contents |
 | --- | --- |
 | skills/work-with-chaos/ | Workflow entrypoint, internal guides, and templates |
+| skills/work-with-chaos-subagent/ | Delegation workflow entrypoint and dispatch template; requires work-with-chaos |
 | skills/diagnose-linux-disk/ | Disk diagnosis entrypoint, storage guide, and UI metadata |
 | .claude-plugin/ | Collection plugin and marketplace metadata |
-| scripts/setup-symlinks.sh | Installer for the two top-level skills |
+| scripts/setup-symlinks.sh | Installer for the three top-level skills |
 | docs/ | Workflow overview and design decisions |

@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # setup-symlinks.sh — fallback install: symlink this repo's skills into ~/.claude/skills/
-# Keeps the flat invocation names (/work-with-chaos, /diagnose-linux-disk)
+# Keeps the flat invocation names (/work-with-chaos, /work-with-chaos-subagent,
+# /diagnose-linux-disk)
 # instead of the plugin-namespaced forms. Idempotent — safe to re-run after pulling.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TARGET_DIR="${CHAOS_SKILLS_TARGET_DIR:-$HOME/.claude/skills}"
-SKILLS=(work-with-chaos diagnose-linux-disk)
+# Keep the subagent workflow alongside its required work-with-chaos base.
+SKILLS=(work-with-chaos work-with-chaos-subagent diagnose-linux-disk)
 
 mkdir -p "$TARGET_DIR"
 

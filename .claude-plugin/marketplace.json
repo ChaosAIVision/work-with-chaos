@@ -8,7 +8,7 @@
     {
       "name": "chaos-skill",
       "source": "./",
-      "description": "Two skills: work-with-chaos and diagnose-linux-disk."
+      "description": "Three skills: work-with-chaos, work-with-chaos-subagent, and diagnose-linux-disk."
     }
   ]
 }
