@@ -1,8 +1,3 @@
----
-name: benchmark
-description: Measure performance claims and label every one with the evidence ladder. Use when comparing technical options, setting quality-contract thresholds, validating a query/API/implementation's latency-memory-CPU-cost, or when another skill needs benchmark evidence or an evidence-ladder verdict on a claim.
----
-
 # Benchmark
 
 Produce **labeled evidence** for performance claims. A claim without a label is not evidence — it is a pitch.
@@ -41,7 +36,7 @@ Pick the cheapest rung that can answer the question at the stakes it carries (ru
 - Repeat ≥ 5 runs, report median and spread, not a single run.
 - Track what the question asks: wall time, p95, RSS, CPU, cost per 1k calls. Record all conditions.
 
-**🟢 Measured** — same discipline, on the real environment. Note in the output that credentials/environment access was required (the `input-gate` skill should have confirmed it first).
+**🟢 Measured** — same discipline, on the real environment. Note in the output that credentials/environment access was required (the [input-gate guide](input-gate.md) should have confirmed it first).
 
 **🔴 Cited** — only primary sources. Vendor marketing numbers without methodology are ⚫. Record the applicability conditions verbatim: their Postgres 16 on their hardware is not your Postgres 16 on yours until you say both.
 

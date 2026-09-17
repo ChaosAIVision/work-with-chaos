@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # setup-symlinks.sh — fallback install: symlink this repo's skills into ~/.claude/skills/
-# Keeps the flat invocation names (/work-with-chaos, /benchmark, /decide, /input-gate, /report)
+# Keeps the flat invocation names (/work-with-chaos, /diagnose-linux-disk)
 # instead of the plugin-namespaced forms. Idempotent — safe to re-run after pulling.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TARGET_DIR="$HOME/.claude/skills"
-SKILLS=(work-with-chaos benchmark decide input-gate report)
+TARGET_DIR="${CHAOS_SKILLS_TARGET_DIR:-$HOME/.claude/skills}"
+SKILLS=(work-with-chaos diagnose-linux-disk)
 
 mkdir -p "$TARGET_DIR"
 
@@ -35,4 +35,15 @@ for skill in "${SKILLS[@]}"; do
   echo "✓ $skill: linked → $src"
 done
 
-echo "Done. Restart Claude Code (or run /reload-plugins) to pick them up."
+# Retire only helper links managed by this checkout after their files moved.
+# Real directories and links to other checkouts remain untouched.
+for helper in benchmark decide input-gate report; do
+  old_src="$REPO_ROOT/skills/$helper"
+  old_dst="$TARGET_DIR/$helper"
+  if [ -L "$old_dst" ] && [ "$(readlink "$old_dst")" = "$old_src" ] && [ ! -e "$old_src/SKILL.md" ]; then
+    rm -- "$old_dst"
+    echo "Removed obsolete helper link: $helper"
+  fi
+done
+
+echo "Done."

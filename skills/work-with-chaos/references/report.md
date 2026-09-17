@@ -1,14 +1,9 @@
----
-name: report
-description: Render decision reports (options, trade-offs, labeled evidence) and delivery reports (end-to-end flow plus per-module input/output), as markdown source-of-truth files with optional HTML views. Use after research, at milestones, on-demand, or when another skill needs its findings rendered for review.
----
-
 # Report
 
 Two artifacts, two moments:
 
 - **Decision Report** — after research, before choosing. Its reader is deciding.
-- **Delivery Report** — at a milestone or on demand (`/report`). Its reader is accepting work.
+- **Delivery Report** — at a milestone or on demand (request a report through work-with-chaos). Its reader is accepting work.
 
 Markdown in the repo is the source of truth; HTML is a view, rendered on top, never edited directly.
 
@@ -18,9 +13,9 @@ Save as `docs/research/<slug>.md` in the target repo, following the `research` s
 
 1. **Question** — the measurable question the research set out to answer.
 2. **Options** — one section per option: what it is, how it works, what it costs.
-3. **Evidence table** — the `benchmark` skill's output pasted whole: option, result, ladder label, conditions. Reject the table if any number lacks a label.
+3. **Evidence table** — the [benchmark guide](benchmark.md)'s output pasted whole: option, result, ladder label, conditions. Reject the table if any number lacks a label.
 4. **Trade-offs** — per option, what you gain and what you pay. No option gets only-gains prose.
-5. **Open choices** — the axes still needing a human decision, phrased so the `decide` skill can turn each into one question with options.
+5. **Open choices** — the axes still needing a human decision, phrased so the [decide guide](decide.md) can turn each into one question with options.
 
 ## Delivery Report
 

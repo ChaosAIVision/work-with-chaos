@@ -1,14 +1,14 @@
 {
-  "name": "work-with-chaos",
+  "name": "chaos-skill",
   "owner": {
     "name": "Chaos",
     "url": "https://github.com/ChaosAIVision"
   },
   "plugins": [
     {
-      "name": "work-with-chaos",
+      "name": "chaos-skill",
       "source": "./",
-      "description": "One pipeline for every task: research with labeled evidence, fast decisions, anti-stall input gate, delivery reports."
+      "description": "Two skills: work-with-chaos and diagnose-linux-disk."
     }
   ]
 }

@@ -27,9 +27,25 @@ Rules that make this hold:
 5. **If you already edited in the wrong phase: revert, then record.** Undo the edit, put the Candidate Finding where it belongs, and say so in `STATUS.md`. Do not keep the edit because "it was right" — the process violation is the defect now.
 6. **When the human says fix it now, that's a phase change.** Update `STATUS.md` to phase 5 with that ticket first. One line, then implement. The protocol doesn't block the human — it blocks *drift*.
 
-## Skill wiring — what the AI can and cannot call
+## Internal guides
 
-A skill referenced below is invoked through the Skill tool, which only works for **model-invocable** skills. Of the matt-pocock set, `research`, `grilling`, `domain-modeling`, `code-review`, `tdd`, `wizard` are model-invocable — the AI calls them on its own when the phase says so. The rest (`to-tickets`, `implement`, `handoff`, `grill-me`, `grill-with-docs`, `to-spec`, `teach`, …) are user-only slash commands (`disable-model-invocation: true`): **the AI cannot call them, ever.** Where a phase leans on one, its behavior is inlined in the phase text and the name is attribution, not an invocation. For the full original, the human runs the slash command.
+The following procedures are bundled references inside this skill. Read the relevant guide directly at its phase; do not invoke a separate benchmark, decide, input-gate, or report skill.
+
+| Phase or need | Read |
+| --- | --- |
+| Compare options or substantiate performance | [Benchmark](references/benchmark.md) |
+| Close open decisions and lock the contract | [Decide](references/decide.md) |
+| Verify inputs before implementation | [Input gate](references/input-gate.md) |
+| Write a Decision Report or Delivery Report | [Report](references/report.md) |
+| Order tickets | [Domino checklist](references/domino-checklist.md) |
+| Seed quality thresholds | [Quality contract template](references/quality-contract-template.md) |
+| Resolve workflow vocabulary | [Context](references/context.md) |
+
+Resolve these paths relative to this SKILL.md. The repository also contains the independent diagnose-linux-disk skill; its diagnostic workflow does not inherit this orchestration pipeline.
+
+## External skill wiring — what the AI can and cannot call
+
+An external skill referenced below is invoked through the Skill tool, which only works for **model-invocable** skills. Of the matt-pocock set, `research`, `grilling`, `domain-modeling`, `code-review`, `tdd`, `wizard` are model-invocable — the AI calls them on its own when the phase says so. The rest (`to-tickets`, `implement`, `handoff`, `grill-me`, `grill-with-docs`, `to-spec`, `teach`, …) are user-only slash commands (`disable-model-invocation: true`): **the AI cannot call them, ever.** Where a phase leans on one, its behavior is inlined in the phase text and the name is attribution, not an invocation. For the full original, the human runs the slash command.
 
 `grill-with-docs` is the composition `grilling` + `domain-modeling` — both invocable — so the pipeline reproduces it inline where it belongs instead of calling a command it can't.
 
@@ -44,7 +60,7 @@ A skill referenced below is invoked through the Skill tool, which only works for
 
 Two layers, per the ADR on planning:
 
-- **Breadth-Plan** (one session, all projects): thin plans, just deep enough to order the Work Blocks and surface which projects lack inputs. Output: the day's block order + the first Stalled list (feed to `input-gate`).
+- **Breadth-Plan** (one session, all projects): thin plans, just deep enough to order the Work Blocks and surface which projects lack inputs. Output: the day's block order + the first Stalled list (feed to the [input gate](references/input-gate.md)).
 - **Deep-Plan** (per project, in the block before that project's implement block): full pipeline below for that project's task.
 
 ## Phase 2 — Research
@@ -54,14 +70,14 @@ Two background agents in parallel (dispatch both, keep working):
 - **Inside agent** — scans the existing codebase: current patterns, dependencies, constraints, prior art.
 - **Outside agent** — the `research` skill: primary sources only.
 
-Then the `benchmark` skill turns comparisons into labeled evidence. Output: a **Decision Report** (`report` skill, Decision form) — options, trade-offs, evidence table, open choices, **Candidate Findings** (defects seen while scanning, recorded — not fixed — per Phase Discipline).
+Read [benchmark](references/benchmark.md) to turn comparisons into labeled evidence. Output: a **Decision Report** ([report guide](references/report.md), Decision form) — options, trade-offs, evidence table, open choices, **Candidate Findings** (defects seen while scanning, recorded — not fixed — per Phase Discipline).
 
 ## Phase 3 — Decide
 
 Two instruments, in order:
 
-1. **Grill first** — the `grilling` skill (model-invocable): interview the human in frontier rounds over the Decision Report — every open decision, numbered questions, recommended answer each. The `decide` skill's six-axis sweep is the *map* of what to grill; grilling is how each genuinely open axis gets closed. Where an ADR or glossary entry crystallizes mid-grill, write it per `domain-modeling` as you go (this is `grill-with-docs` inlined — its parts are invocable even though the command isn't).
-2. **Then lock** — the `decide` skill: settle anything grilling left as clicks (one AskUserQuestion per remaining open axis — settled axes get one line citing their ADR, not a question). Lock `QUALITY-CONTRACT.md` here if not yet locked. Decisions land in `docs/adr/` per the `domain-modeling` skill. Candidate Findings get triaged here: fix-in-phase-5 (becomes a ticket), defer, or reject — one decision each.
+1. **Grill first** — the `grilling` skill (model-invocable): interview the human in frontier rounds over the Decision Report — every open decision, numbered questions, recommended answer each. The [decide guide](references/decide.md)'s six-axis sweep is the *map* of what to grill; grilling is how each genuinely open axis gets closed. Where an ADR or glossary entry crystallizes mid-grill, write it per `domain-modeling` as you go (this is `grill-with-docs` inlined — its parts are invocable even though the command isn't).
+2. **Then lock** — the [decide guide](references/decide.md): settle anything grilling left as clicks (one AskUserQuestion per remaining open axis — settled axes get one line citing their ADR, not a question). Lock `QUALITY-CONTRACT.md` here if not yet locked. Decisions land in `docs/adr/` per the `domain-modeling` skill. Candidate Findings get triaged here: fix-in-phase-5 (becomes a ticket), defer, or reject — one decision each.
 
 ## Phase 4 — Tickets
 
@@ -71,7 +87,7 @@ Ticket format follows `to-tickets` (user-only command — behavior inlined here;
 - **Output** — the same anchors *after* the change: which functions/files are added, modified, or deleted — new signature + one line of new behavior. The code is the artifact; name it. Bad: "swap detection source to ABBOTT API". Good: "`_check_ra_shop()` (`scripts/run_batch_async.py`) → GET `{ABBOTT_API_BASE}/api/ai-qc/intraday/records?callId=`; `_ra_shop_api_target` + 3rd-party path deleted."
 - **Gate inputs** — the checkable externals `input-gate` verifies before phase 5 (credentials, data, env, access, a verified API, an accepted ADR). Lives here — never mixed into Input/Output.
 - **Quality gate** — the contract thresholds + evidence label (🟢/🟡/🔴/⚫) this ticket must meet
-- **Domino Note** — why this ticket sits at this position (`${CLAUDE_SKILL_DIR}/domino-checklist.md`)
+- **Domino Note** — why this ticket sits at this position ([domino checklist](references/domino-checklist.md))
 
 Input = before, Output = after, both as code locations. Code-anchored Input/Output is what makes phase 5's scope check enforceable: "the functions this ticket's Output names" is matchable; "swap the detection source" is not.
 
@@ -81,7 +97,7 @@ Order by the domino checklist, top-down; the first discriminating rule decides. 
 
 ## Phase 5 — Implement
 
-1. Precondition: the Approval Gate has passed — `STATUS.md` shows `Plan approved: <date>`. If it doesn't, the work is at phase 4, not here. Then run `input-gate` on the frontier ticket. Stalled → park it in `STATUS.md`, offer a `wizard` for the human-only step, move to the next ticket. The block never waits.
+1. Precondition: the Approval Gate has passed — `STATUS.md` shows `Plan approved: <date>`. If it doesn't, the work is at phase 4, not here. Then apply the [input gate](references/input-gate.md) to the frontier ticket. Stalled → park it in `STATUS.md`, offer a `wizard` for the human-only step, move to the next ticket. The block never waits.
 2. **Scope check before the first edit**: the files this ticket names are the files you may edit. A defect found mid-implementation *outside* that scope is a Candidate Finding for the next ticket — not a detour. (Inside scope: fix it, it's why the ticket exists.)
 3. Implement in the `implement` style (user-only command — inlined; run `/implement` for the full original): /tdd at pre-agreed seams, regular typechecks, full suite at the end.
 4. In parallel: a background agent hunts edge cases against the *current* ticket; findings feed the *next* ticket's test cases, never the running one.
@@ -95,11 +111,11 @@ Review is read-only. Every defect it finds — including one-line fixes — is r
 
 ## Phase 7 — Report
 
-At milestone or `/report`: the `report` skill, Delivery form — end-to-end flow + per-module table (Task → Module → Interfaces → Tests → Architecture rules honored), plus the plain **Unverified claims** list. Update `STATUS.md`; if the block ends, write a handoff in the `handoff` style (user-only command — inlined; run `/handoff` for the full original).
+At a milestone or when a report is requested: the [report guide](references/report.md), Delivery form — end-to-end flow + per-module table (Task → Module → Interfaces → Tests → Architecture rules honored), plus the plain **Unverified claims** list. Update `STATUS.md`; if the block ends, write a handoff in the `handoff` style (user-only command — inlined; run `/handoff` for the full original).
 
 ## Vocabulary
 
-The glossary lives in this repo's `CONTEXT.md` — Work Block, Stalled Task, Input Gate, Checkpoint, Breadth-Plan, Deep-Plan, Domino Note, Quality Contract, Evidence Ladder, Candidate Finding, Decision Report, Delivery Report. Use these terms; don't rename them mid-flight.
+The glossary lives in [references/context.md](references/context.md) — Work Block, Stalled Task, Input Gate, Checkpoint, Breadth-Plan, Deep-Plan, Domino Note, Quality Contract, Evidence Ladder, Candidate Finding, Decision Report, Delivery Report. Use these terms; don't rename them mid-flight.
 
 ## STATUS.md template
 

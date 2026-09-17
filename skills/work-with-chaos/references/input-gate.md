@@ -1,8 +1,3 @@
----
-name: input-gate
-description: Check a task has every human-only input it needs before work starts, so sessions never stall mid-implementation. Use before starting any implement work block, when a task seems about to block on credentials/data/env/access, or when another skill needs to declare a task stalled.
----
-
 # Input Gate
 
 A **Stalled Task** is a task waiting on something only a human can provide — a password, a data export, an environment URL, a permission grant. Stalls are the single largest time sink this skill set exists to kill. The gate's job: discover the stall *before* the work starts, park it, and move on — never sit waiting.

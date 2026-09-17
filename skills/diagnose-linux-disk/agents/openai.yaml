@@ -1,0 +1,15 @@
+interface:
+  display_name: Chẩn đoán dung lượng Linux
+  short_description: Tìm disk ẩn, Docker và chênh lệch df–du trên Linux
+  default_prompt: Dùng $diagnose-linux-disk để tìm nguyên nhân disk bị chiếm nhiều
+    trên server Linux, đối chiếu df với du và báo phần dung lượng còn chưa giải thích
+    được.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
