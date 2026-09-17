@@ -16,20 +16,31 @@ The fix isn't more discipline. It's a protocol: the human manages, the AI works 
 | Requirements unclear → build → feedback → rebuild | Decisions close up front: six-axis sweep, one click per open question |
 | Agent slides from research into unrequested code edits | Phase discipline: edits only in phase 5 on the frontier ticket; other phases file Candidate Findings ([ADR-0003](adr/0003-plan-first-no-edits-outside-implement.md)) |
 | Plans go stale before implementation | Two-layer planning: thin breadth-plan for the day, deep-plan per project right before its block |
+| Strong requirements become an ambiguous task list | Stable requirement IDs, outcome tasks, explicit dependencies, and observable verification |
+| A requirement changes after some tasks are done | Revise the existing plan; keep valid evidence and reopen affected acceptance criteria |
 
 ## The pipeline
 
-```
-0 Orient    → read STATUS.md, resume where the repo left off
-1 Plan      → breadth-plan the day's blocks; deep-plan per project
-2 Research  → codebase scan + primary sources, in parallel; benchmark what compares
-3 Decide    → six-axis sweep (architecture · performance · database · api · security · test),
-              one question per genuinely open axis; lock the Quality Contract
-4 Tickets   → tracer-bullet slices with code-anchored Input / Output (function before → function after), Gate inputs, Quality gate, Domino note
-5 Implement → input gate → TDD, background edge-case hunt → checkpoint per ticket
-6 Review    → standards + spec + performance-vs-contract, in parallel
-7 Report    → delivery report: end-to-end flow + per-module IO table + unverified-claims list
-```
+| Phase | Result |
+| --- | --- |
+| 0 Orient | Read STATUS.md, its linked plan revision, the active ticket, and evidence |
+| 1 Plan | Objective, stable requirements, scope boundaries, facts, and unknowns |
+| 2 Research | Resolve uncertainties affecting scope, task boundaries, order, or verification; cite code and primary sources |
+| 3 Decide | Close material open choices; preserve accepted requirements and applicable quality thresholds |
+| 4 Tickets | Outcome tasks with requirement ownership, code-anchored Input/Output, dependencies, Gate inputs, verification, and Domino Notes; review before presenting |
+| 5 Implement | Confirm approval and readiness; implement within the ticket contract, verify, then checkpoint |
+| 6 Review | Inspect actual evidence against the original objective, including integration and failure paths |
+| 7 Report | Requirement verdicts, end-to-end flow, per-module evidence, remaining unverified claims, and next action |
+
+The phases govern work; they are not the implementation task list. A plan-only request ends at phase 4 with a reviewed plan. Already settled phases can cite their evidence concisely without inventing questions or extra work.
+
+## What a plan contains
+
+Use the [planning guide](../skills/work-with-chaos/references/planning.md) and [plan/ticket templates](../skills/work-with-chaos/references/plan-template.md). One canonical plan owns requirements and acceptance. STATUS.md records its path, revision, active phase, approval scope, and exact next action.
+
+The overview connects each requirement to responsible tasks and completion evidence. Tickets describe current code, intended behavior, allowed files, required inputs, and checks with expected results. New functions are explicitly proposed; a planned test is never reported as a passed test.
+
+Flexible plans follow actual dependencies, with domino rules breaking ties among eligible tasks. Ordered plans preserve the user's required sequence and stop at a blocked step. Requirement changes keep stable task IDs and valid progress, but reopen tasks whose outputs no longer meet the new contract. See [ADR-0006](adr/0006-outcome-based-planning.md) and the [source research](research/2026-09-17-work-with-chaos-planning.md).
 
 ## Install
 
@@ -37,12 +48,13 @@ See the [collection installation guide](../README.md#installation).
 
 ## Workflow components
 
-| Skill | What it does |
+| Internal component | What it does |
 |---|---|
 | `work-with-chaos` | The orchestrator: seven phases, `STATUS.md` routing, two-layer planning, phase discipline (code edits only in phase 5; everything else files Candidate Findings) |
 | `benchmark` | The evidence ladder — 🟢 measured · 🟡 sandbox · 🔴 cited · ⚫ unverified — and the sandbox method behind 🟡 |
-| `decide` | Six-axis sweep; one AskUserQuestion per open axis; ADRs and the Quality Contract lock |
-| `input-gate` | Credentials/data/env/access/decisions verified *by doing* before work starts; `BLOCKED.md` + wizard for what only a human can clear |
+| `planning` | Requirement coverage, outcome decomposition, dependencies, verification, and state-preserving revision |
+| `decide` | Six-axis sweep for genuine decisions; ADRs where consequential and applicable Quality Contract thresholds |
+| `input-gate` | Gate inputs and approval checked before affected execution; Stalled section in STATUS.md, with mode-aware task selection |
 | `report` | Decision reports (options, trade-offs, labeled evidence) and delivery reports (flow + per-module table) |
 
 ## The evidence ladder
@@ -59,10 +71,11 @@ A number found without a label is a defect, treated like a failing test.
 ## Design rules
 
 1. **Every task, no fast lane** — uniformity is the point; lane assignment is the judgement call this set exists to remove ([ADR-0001](adr/0001-full-pipeline-for-every-task.md))
-2. **Wrap, never edit** — matt-pocock skills are called as-is; wrappers add behavior ([ADR-0002](adr/0002-orchestrator-plus-wrappers.md))
+2. **Reuse available integrations** — external skills are used as-is when installed and invocable; internal guides provide a portable fallback ([ADR-0005](adr/0005-two-top-level-skills.md))
 3. **Markdown is the source of truth** — HTML is a view; the moment it drifts, it's lying
-4. **Stalled tasks park, sessions don't wait** — a failed gate costs one line in a file, not a block of time
-5. **Decisions arrive as clicks** — batched AskUserQuestion, trade-offs inline, evidence labels on every number
+4. **Stalled tasks respect dependencies** — continue eligible flexible work; never jump over a required ordered step
+5. **Ask only material open questions** — use the host's available question mechanism, preserve settled decisions, and reuse valid authorization
+6. **Completion requires evidence** — task checkboxes and green builds alone cannot establish the user's objective
 
 ## Bundled resources
 

@@ -1,6 +1,6 @@
 ---
 name: work-with-chaos
-description: The master workflow for starting or resuming any piece of work in any project - routes to the right phase (plan, research, decide, tickets, implement, review, report) from the repo's STATUS.md, runs the input gate before implementation, and keeps evidence labels on every performance claim. Use when beginning a task, resuming a session, planning a day across projects, or when unsure which phase a piece of work is in.
+description: Plan, execute, and resume work through an explicit workflow. Turns requirements into outcome-based tasks with code anchors, dependencies, and verifiable completion criteria; routes phases through STATUS.md, requires plan approval before implementation, and labels performance evidence. Use when starting or resuming work, creating or revising a project plan, planning a day across projects, or resolving an ambiguous task list.
 ---
 
 # Work With Chaos
@@ -24,7 +24,7 @@ Rules that make this hold:
 2. **There is no "small fix" exemption.** A one-line signature change *is* an implementation decision — it has a caller, a test, and a place in the Decision Report. "It's just one line" is exactly how a session slides from research into unreviewed implementation, edit after edit, without anyone choosing to.
 3. **Findings, not fixes.** When research or verification surfaces a defect (wrong signature, dead call, broken import), record it as a **Candidate Finding**: file:line, what's wrong, evidence, proposed fix. File it in the Decision Report (phase 2–3) or as a ticket (phase 4+). The fix happens in phase 5 against a ticket, with tests, at a Checkpoint — or it doesn't happen this cycle.
 4. **Verify read-only.** Running tests, grepping, reading files, measuring — always allowed, every phase. These are how findings get their evidence labels. The moment verification tempts an edit, that temptation is the finding.
-5. **If you already edited in the wrong phase: revert, then record.** Undo the edit, put the Candidate Finding where it belongs, and say so in `STATUS.md`. Do not keep the edit because "it was right" — the process violation is the defect now.
+5. **If you already edited in the wrong phase: revert your edit, then record.** Undo only your out-of-phase changes, preserving unrelated user work. Put the Candidate Finding where it belongs and say so in `STATUS.md`.
 6. **When the human says fix it now, that's a phase change.** Update `STATUS.md` to phase 5 with that ticket first. One line, then implement. The protocol doesn't block the human — it blocks *drift*.
 
 ## Internal guides
@@ -33,6 +33,7 @@ The following procedures are bundled references inside this skill. Read the rele
 
 | Phase or need | Read |
 | --- | --- |
+| Create, review, or revise a plan | [Planning](references/planning.md) and [plan / ticket templates](references/plan-template.md) |
 | Compare options or substantiate performance | [Benchmark](references/benchmark.md) |
 | Close open decisions and lock the contract | [Decide](references/decide.md) |
 | Verify inputs before implementation | [Input gate](references/input-gate.md) |
@@ -43,18 +44,17 @@ The following procedures are bundled references inside this skill. Read the rele
 
 Resolve these paths relative to this SKILL.md. The repository also contains the independent diagnose-linux-disk skill; its diagnostic workflow does not inherit this orchestration pipeline.
 
-## External skill wiring — what the AI can and cannot call
+## External skill wiring
 
-An external skill referenced below is invoked through the Skill tool, which only works for **model-invocable** skills. Of the matt-pocock set, `research`, `grilling`, `domain-modeling`, `code-review`, `tdd`, `wizard` are model-invocable — the AI calls them on its own when the phase says so. The rest (`to-tickets`, `implement`, `handoff`, `grill-me`, `grill-with-docs`, `to-spec`, `teach`, …) are user-only slash commands (`disable-model-invocation: true`): **the AI cannot call them, ever.** Where a phase leans on one, its behavior is inlined in the phase text and the name is attribution, not an invocation. For the full original, the human runs the slash command.
-
-`grill-with-docs` is the composition `grilling` + `domain-modeling` — both invocable — so the pipeline reproduces it inline where it belongs instead of calling a command it can't.
+Use installed, model-invocable `research`, `grilling`, `domain-modeling`, `code-review`, `tdd`, and `wizard` skills when available. Inspect their actual availability and invocation rules; do not assume a tool or skill exists. Names such as `to-tickets`, `implement`, and `handoff` are attribution for the behavior inlined below, not permission to invoke a user-only command. If an integration is absent, follow this skill's bundled procedure directly. If agents are unavailable, perform the relevant checks yourself and do not call that an independent review.
 
 ## Phase 0 — Orient (every session start)
 
-1. Read the target repo's `STATUS.md` (create it if absent — template below). It holds: current phase, active task, **Stalled** tasks with their missing inputs, open decisions, plan approval.
-2. If `STATUS.md` shows work in flight → resume that phase, under Phase Discipline above. A file showing phase 5 without `Plan approved:` set is actually at phase 4 behind the Approval Gate — present the package, don't resume the edits. If the session starts clean → Phase 1.
+1. Read the target repo's `STATUS.md` (create it if absent — template below), its linked plan, active ticket, and recorded evidence. Re-read the objective and requirements after a handoff or context compaction, not just the last checkbox.
+2. Resume the recorded phase under Phase Discipline. Phase 5 requires approval covering the active plan revision and scope; a date alone is not sufficient if the requirements changed. For an older plan, reconcile its recorded approval with the unchanged scope instead of discarding valid consent. If the session starts clean → Phase 1.
+3. User steering updates the existing plan through the revision procedure in [planning](references/planning.md). Keep stable task IDs and valid completed work; revalidate changed acceptance criteria.
 
-`STATUS.md` is the only routing source. Never ask the human "where were we?" — that question is what this file exists to answer. It is also the only thing that unlocks code edits: no `STATUS.md` at phase 5 *with the Approval Gate passed*, no `Edit`/`Write` on source files.
+`STATUS.md` is the routing index; the linked plan owns requirements, task order, and acceptance criteria. Do not maintain a second competing plan in status or chat. Recover state from artifacts before asking the human. A user correction overrides stale status; record it before acting.
 
 ## Phase 1 — Plan
 
@@ -63,55 +63,63 @@ Two layers, per the ADR on planning:
 - **Breadth-Plan** (one session, all projects): thin plans, just deep enough to order the Work Blocks and surface which projects lack inputs. Output: the day's block order + the first Stalled list (feed to the [input gate](references/input-gate.md)).
 - **Deep-Plan** (per project, in the block before that project's implement block): full pipeline below for that project's task.
 
+For every Deep-Plan, read [planning](references/planning.md) and use the [templates](references/plan-template.md). Create one canonical plan using the project's existing convention, otherwise `.scratch/<slug>/PLAN.md`. Start with the objective, stable requirement IDs, scope boundaries, observed code, and genuine unknowns. Distinguish user requirements, facts, accepted decisions, and proposed assumptions.
+
+The phases describe how to work; they are **not the task list**. Plan deliverable outcomes, not "research → backend → frontend → test" headings. Include a first useful end-to-end slice, explicit dependencies, and observable completion evidence. Phases still apply to every task, but a settled phase can cite existing evidence in one line; do not manufacture questions, tickets, or documents to fill the process.
+
+If the request is **plan only**, the deliverable is a reviewed plan through phase 4. Do not implement, require production access to finish planning, or ask for execution approval unless the user wants to proceed.
+
 ## Phase 2 — Research
 
-Two background agents in parallel (dispatch both, keep working):
+Research the uncertainties that can change scope, task boundaries, order, or verification. When both investigations are needed and agents are available, run them in parallel:
 
 - **Inside agent** — scans the existing codebase: current patterns, dependencies, constraints, prior art.
 - **Outside agent** — the `research` skill: primary sources only.
 
-Read [benchmark](references/benchmark.md) to turn comparisons into labeled evidence. Output: a **Decision Report** ([report guide](references/report.md), Decision form) — options, trade-offs, evidence table, open choices, **Candidate Findings** (defects seen while scanning, recorded — not fixed — per Phase Discipline).
+Read [benchmark](references/benchmark.md) for comparisons and performance claims. Record sources, observed file/function anchors, trade-offs, open choices, and **Candidate Findings** in a **Decision Report** ([report guide](references/report.md), Decision form). Link substantial research from the plan; a short settled finding can live in the plan itself. Resolve repository facts by inspection before asking the user. Do not invent an existing API or function; mark additions as **proposed new**.
 
 ## Phase 3 — Decide
 
 Two instruments, in order:
 
-1. **Grill first** — the `grilling` skill (model-invocable): interview the human in frontier rounds over the Decision Report — every open decision, numbered questions, recommended answer each. The [decide guide](references/decide.md)'s six-axis sweep is the *map* of what to grill; grilling is how each genuinely open axis gets closed. Where an ADR or glossary entry crystallizes mid-grill, write it per `domain-modeling` as you go (this is `grill-with-docs` inlined — its parts are invocable even though the command isn't).
-2. **Then lock** — the [decide guide](references/decide.md): settle anything grilling left as clicks (one AskUserQuestion per remaining open axis — settled axes get one line citing their ADR, not a question). Lock `QUALITY-CONTRACT.md` here if not yet locked. Decisions land in `docs/adr/` per the `domain-modeling` skill. Candidate Findings get triaged here: fix-in-phase-5 (becomes a ticket), defer, or reject — one decision each.
+1. **Grill genuinely open decisions** using the [decide guide](references/decide.md)'s six-axis sweep. Preserve settled requirements. Ask only when the answer materially changes scope, architecture, acceptance, or a required user choice; do not turn each axis into a compulsory question. Recommend a supported default and explain its trade-off.
+2. **Lock the outcome contract** in the plan: objective, requirement coverage, boundaries, verification, and unresolved blockers. Record consequential decisions in `docs/adr/`; keep routine decisions in the plan. Preserve an existing `QUALITY-CONTRACT.md`; add supported thresholds only where applicable, without inventing a performance SLA. Triage Candidate Findings: include in phase 5, defer, or reject.
 
 ## Phase 4 — Tickets
 
-Ticket format follows `to-tickets` (user-only command — behavior inlined here; run `/to-tickets` for the full original): each ticket keeps the local-file convention (`.scratch/<slug>/issues/NN-*.md`, blockers first) plus five fields —
+Compile the plan into tickets using [planning](references/planning.md) and the [ticket template](references/plan-template.md). Keep the existing local-file convention, otherwise `.scratch/<slug>/issues/NN-*.md`. Every ticket has a stable ID, an outcome title, requirement IDs, dependencies (including the output consumed), and these fields:
 
 - **Input** — a **code anchor**: `file` + `function/class` this ticket starts from, and its current behavior in one line — the logic being changed, where it lives *today*. Not "what must exist" in the abstract; that's the pipeline's job. A ticket starts from code, or from the empty file it will create.
 - **Output** — the same anchors *after* the change: which functions/files are added, modified, or deleted — new signature + one line of new behavior. The code is the artifact; name it. Bad: "swap detection source to ABBOTT API". Good: "`_check_ra_shop()` (`scripts/run_batch_async.py`) → GET `{ABBOTT_API_BASE}/api/ai-qc/intraday/records?callId=`; `_ra_shop_api_target` + 3rd-party path deleted."
 - **Gate inputs** — the checkable externals `input-gate` verifies before phase 5 (credentials, data, env, access, a verified API, an accepted ADR). Lives here — never mixed into Input/Output.
-- **Quality gate** — the contract thresholds + evidence label (🟢/🟡/🔴/⚫) this ticket must meet
+- **Verification / Quality gate** — observable pass/fail behavior, fixtures or inspection method, and the evidence to retain. Cite applicable contract thresholds and performance evidence labels. Planned checks are not passed checks.
 - **Domino Note** — why this ticket sits at this position ([domino checklist](references/domino-checklist.md))
 
 Input = before, Output = after, both as code locations. Code-anchored Input/Output is what makes phase 5's scope check enforceable: "the functions this ticket's Output names" is matchable; "swap the detection source" is not.
 
-Order by the domino checklist, top-down; the first discriminating rule decides. Each accepted Candidate Finding becomes a ticket here before anything touches it.
+Choose **flexible** execution (follow actual dependencies) or **ordered** execution (preserve the user's required sequence). Validate dependency IDs and cycles first; use the [domino checklist](references/domino-checklist.md) only among ready tasks. Each accepted Candidate Finding joins a scoped ticket before anything touches it.
 
-**Approval Gate (4 → 5).** Tickets end the plan; they don't start the build. Present the whole package to the human in one pass — one line per locked ADR, the full ticket list in domino order, the `QUALITY-CONTRACT.md` thresholds — then one AskUserQuestion: approve and enter phase 5, or revise. Until `STATUS.md` records `Plan approved: <date>`, phase stays 4 and the only permitted work is revising the plan. The per-axis clicks of phase 3 closed decisions; they are not approval of the plan as a whole. No ticket starts and `input-gate` passes nothing until this gate is passed.
+Before presenting the plan, run the review checklist in [planning](references/planning.md). Ensure every requirement has an owner and discriminating verification, every dependency names a real prerequisite, and the next action is executable. Where available, have a read-only reviewer inspect the plan against the original request and repository evidence. Repair planning defects before approval.
+
+**Approval Gate (4 → 5).** Present one coherent package: objective and boundaries, outcome/task table in execution order, settled decisions, applicable quality thresholds, and remaining blockers. Record approval as `<revision>, <date>, <scope>, <user instruction>`. Existing explicit authorization covering that package remains valid; never ask again merely because a session resumed. Per-axis choices are not automatically whole-plan approval. If execution is requested but approval is missing, ask once after the concrete plan is reviewable, using the host's supported approval channel. For a plan-only request, deliver the plan and leave phase 4; execution approval is not needed to finish that request.
 
 ## Phase 5 — Implement
 
-1. Precondition: the Approval Gate has passed — `STATUS.md` shows `Plan approved: <date>`. If it doesn't, the work is at phase 4, not here. Then apply the [input gate](references/input-gate.md) to the frontier ticket. Stalled → park it in `STATUS.md`, offer a `wizard` for the human-only step, move to the next ticket. The block never waits.
-2. **Scope check before the first edit**: the files this ticket names are the files you may edit. A defect found mid-implementation *outside* that scope is a Candidate Finding for the next ticket — not a detour. (Inside scope: fix it, it's why the ticket exists.)
+1. Confirm approval covers the active revision and ticket. Apply the [input gate](references/input-gate.md) to its **Gate inputs**. In flexible mode, a stalled task permits other dependency-ready work. In ordered mode, do not jump over a blocked step; report its exact missing input and continue only permitted planning or another independent project.
+2. **Scope check before the first edit**: edit only the ticket's allowed files to meet its approved outcome. A defect outside that outcome becomes a Candidate Finding even when it is in the same file. Fix failures of the current acceptance contract before completing the ticket.
 3. Implement in the `implement` style (user-only command — inlined; run `/implement` for the full original): /tdd at pre-agreed seams, regular typechecks, full suite at the end.
-4. In parallel: a background agent hunts edge cases against the *current* ticket; findings feed the *next* ticket's test cases, never the running one.
-5. **Checkpoint** at each ticket's end: commit + tick the ticket's acceptance criteria + update `STATUS.md`. Scope ends at the Checkpoint: new findings after it wait for the next ticket, including "obvious" cleanups.
+4. Where useful, a background agent checks edge cases against the current ticket. A failing acceptance criterion blocks that ticket's completion; an out-of-scope improvement becomes a Candidate Finding for a later ticket.
+5. **Checkpoint**: inspect the output and retain actual verification results before marking the ticket done; commit authorized changes and update `STATUS.md` with the next action. A blocked test leaves its criterion unverified. Skipping a ticket never silently waives its requirements. New scope after the Checkpoint goes through plan revision.
 
 ## Phase 6 — Review
 
-The `code-review` skill (two axes, as-is), plus one added sub-agent: performance vs `QUALITY-CONTRACT.md` and edge-case/error-handling sweep. Unlabeled performance numbers found in code or docs count as findings.
+Review code and the original outcome contract, using an independent read-only reviewer when available. Check each requirement against inspectable artifacts and results, including integration and error paths. A completed task list, green build, or executor summary alone does not establish that the objective was met. Include performance vs applicable `QUALITY-CONTRACT.md` thresholds; unlabeled performance numbers are findings.
 
 Review is read-only. Every defect it finds — including one-line fixes — is reported as a finding with file:line and goes back through tickets. Review that repairs is review that grades its own homework.
 
 ## Phase 7 — Report
 
-At a milestone or when a report is requested: the [report guide](references/report.md), Delivery form — end-to-end flow + per-module table (Task → Module → Interfaces → Tests → Architecture rules honored), plus the plain **Unverified claims** list. Update `STATUS.md`; if the block ends, write a handoff in the `handoff` style (user-only command — inlined; run `/handoff` for the full original).
+At a milestone or when a report is requested: the [report guide](references/report.md), Delivery form — requirement-to-evidence verdicts, end-to-end flow, per-module table, and **Unverified claims**. Distinguish done, partial, and blocked outcomes. Update `STATUS.md` with the plan revision, active ticket, remaining blockers, and exact next action for a handoff.
 
 ## Vocabulary
 
@@ -123,8 +131,11 @@ The glossary lives in [references/context.md](references/context.md) — Work Bl
 # Status
 
 Phase: <1-7 or in-flight note>
-Active: <ticket or task>
-Plan approved: <date> | — (phase 5 locked until the Approval Gate passes)
+Plan: <canonical path>, <revision>
+Mode: flexible | ordered
+Active: <stable ticket ID, or planning>
+Next action: <one concrete action, or exact blocker>
+Plan approved: <revision; date; scope; user instruction> | none
 
 ## Stalled
 - <ticket> — missing <input> — unblocked by <human action>

@@ -1,6 +1,6 @@
 # Quality Contract template (per-stack)
 
-Seed `QUALITY-CONTRACT.md` in the target repo from this template. Fill every threshold from labeled evidence (🟢 or 🟡 preferred; 🔴 only with applicability conditions stated). Lock with the human in one `decide` pass. After locking, thresholds judge — they are no longer proposals.
+Use this template only when a performance contract applies. Preserve existing accepted thresholds. New thresholds need an explicit user requirement or labeled supporting evidence (🟢 or 🟡 preferred; 🔴 with applicability conditions); mark proposals until accepted. Do not create targets merely to fill this template. After locking, thresholds judge — they are no longer proposals.
 
 Delete the rows that don't apply to the stack; add rows the stack needs. A row without a number is not a contract, it's a wish.
 

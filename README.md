@@ -11,9 +11,9 @@ A personal collection of two skills for working with AI.
 
 ### work-with-chaos
 
-Keep work organized through STATUS.md, phase discipline, explicit plan approval, and evidence for performance claims. Its benchmark, decide, input-gate, and report procedures are bundled as internal references, so the workflow is installed as one skill.
+Turn requirements into deliverable tasks with stable IDs, code anchors, real dependencies, and observable completion evidence. A canonical plan records scope and acceptance; STATUS.md records the active phase, revision, approval, and next action. The workflow preserves ordered steps, revalidates affected tasks when requirements change, and keeps implementation behind explicit plan approval.
 
-Read the [workflow overview](docs/work-with-chaos.md), [entrypoint](skills/work-with-chaos/SKILL.md), or [design decisions](docs/adr/). The existing external matt-pocock integrations remain part of this workflow; install those separately when using phases that call them.
+Read the [planning guide](skills/work-with-chaos/references/planning.md), [plan template](skills/work-with-chaos/references/plan-template.md), [workflow overview](docs/work-with-chaos.md), or [design decisions](docs/adr/). Benchmark, decide, input-gate, and report remain internal guides. External matt-pocock integrations can be used when installed; the bundled procedures also work without them.
 
 ### diagnose-linux-disk
 

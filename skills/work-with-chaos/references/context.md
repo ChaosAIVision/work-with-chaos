@@ -11,7 +11,7 @@ Một khung thời gian định trước dành cho một loại việc (plan, im
 _Avoid_: block, time-block (trùng với nghĩa "bị nghẽn")
 
 **Stalled Task**:
-Task bị treo vì thiếu input chỉ con người cung cấp được (password, data, quyền truy cập). Vào hàng đợi `BLOCKED.md`, AI nhảy sang task khác thay vì chờ.
+Task bị treo vì thiếu input cần thiết (data, môi trường, quyền truy cập). Ghi vào mục Stalled của `STATUS.md`. Chỉ chuyển sang task khác nếu dependency và chế độ thực thi cho phép; không vượt bước đang treo trong plan ordered.
 _Avoid_: blocked task, block
 
 **Input Gate**:
@@ -33,7 +33,7 @@ Defect phát hiện thấy ở phase không phải Implement (research, verify, 
 _Avoid_: quick fix, drive-by fix
 
 **Approval Gate**:
-Cổng bắt buộc giữa phase Tickets và phase Implement: trình trọn gói (mỗi ADR đã chốt một dòng + toàn bộ ticket theo thứ tự domino + ngưỡng quality contract) trong một AskUserQuestion duyệt đúng một lần. `STATUS.md` ghi `Plan approved: <date>` thì phase 5 mới mở; chưa duyệt thì việc duy nhất được làm là sửa plan. Click chốt từng trục ở phase Decide là chốt *quyết định*, không phải duyệt *plan*.
+Cổng giữa phase Tickets và phase Implement: trình trọn gói objective, phạm vi, task, dependency, bằng chứng hoàn thành và quyết định quan trọng. `STATUS.md` ghi revision, ngày, phạm vi và chỉ dẫn duyệt của người dùng. Giữ hiệu lực của phê duyệt đã có cho đúng phạm vi; không tự áp dụng phê duyệt cũ cho requirement mới. Yêu cầu chỉ lập plan kết thúc ở phase 4, không cần xin duyệt thực thi. Chốt từng quyết định không tự động là duyệt toàn bộ plan.
 _Avoid_: coi từng câu hỏi phase Decide là đã duyệt tổng thể, "review cuối" tự hiểu
 
 **Breadth-Plan**:
@@ -46,12 +46,22 @@ _Avoid_: detailed plan
 
 **Domino Note**:
 Trường trong ticket ghi: task này hoàn thành thì task nào dễ test/sửa hơn hoặc không còn cần nữa. Thứ tự domino khi xếp ticket (nguyên tắc CHUỖI, timvu.vn/fast).
+Dependency thật và thứ tự người dùng yêu cầu được ưu tiên; domino chỉ chọn giữa các task đủ điều kiện trong chế độ flexible.
 _Avoid_: dependency note
+
+**Outcome Contract**:
+Objective, requirement có ID ổn định, ranh giới scope và bằng chứng xác nhận kết quả. Là cơ sở chia task và kết luận hoàn thành; không được thay bằng danh sách phase hay số checkbox đã tick.
+
+**Plan Revision**:
+Phiên bản của plan chuẩn được `STATUS.md` trỏ tới. Khi requirement đổi, giữ ID và evidence còn hợp lệ; mở lại task nếu output không còn đạt điều kiện mới. Evidence cũ là lịch sử, không phải bằng chứng cho điều kiện chưa kiểm tra.
+
+**Execution Mode**:
+Flexible: chọn task có dependency và input đã đủ. Ordered: giữ chuỗi bước bắt buộc; bước trước đang treo thì chưa chạy bước sau.
 
 ### Chất lượng & bằng chứng
 
 **Quality Contract**:
-Bộ ngưỡng s��� đo được (p95 latency, query time, memory, CPU, cost) mà một phương án phải đạt mới được claim "tốt". AI đề xuất ngưỡng lúc research; Chaos chốt một lần; lưu `QUALITY-CONTRACT.md` trong repo. Không được tự bịa ngưỡng khi đang đề xuất phương án.
+Bộ ngưỡng đo được (p95 latency, query time, memory, CPU, cost) áp dụng cho scope đã chốt. Giữ ngưỡng được duyệt trong `QUALITY-CONTRACT.md`; ngưỡng mới cần requirement hoặc bằng chứng có nhãn và được chấp nhận. Không tự tạo SLA khi task chỉ cần acceptance chức năng.
 _Avoid_: perf requirements, SLA
 
 **Evidence Ladder**:

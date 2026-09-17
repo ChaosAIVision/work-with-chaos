@@ -9,7 +9,7 @@ Markdown in the repo is the source of truth; HTML is a view, rendered on top, ne
 
 ## Decision Report
 
-Save as `docs/research/<slug>.md` in the target repo, following the `research` skill's citation discipline (every claim carries its source). Structure:
+For substantial research, save as `docs/research/<slug>.md` and link from the canonical plan. Short settled findings can live directly in the plan. Cite sources for researched claims. Structure, omitting inapplicable comparison sections:
 
 1. **Question** — the measurable question the research set out to answer.
 2. **Options** — one section per option: what it is, how it works, what it costs.
@@ -21,7 +21,14 @@ Save as `docs/research/<slug>.md` in the target repo, following the `research` s
 
 Save as `docs/reports/<date>-<slug>.md`. Two forms, both required:
 
-**Form 1 — Flow**: the end-to-end path the implemented change takes through the system, as a mermaid diagram plus a paragraph walking through it. A reader who sees only this form understands *what happens now that didn't before*.
+First reconcile the original outcome contract with actual evidence:
+
+| Requirement | Verdict: met / unmet / unverified | Evidence and conditions | Remaining work |
+| --- | --- | --- | --- |
+
+Use stable requirement IDs from the active plan revision. Inspect outputs and verification results; ticket status and an executor's summary are not proof. Missing required evidence means incomplete or unverified, even if every task is checked. For a plan-only request, deliver the reviewed plan and planning limitations instead of pretending to produce an implementation Delivery Report.
+
+**Form 1 — Flow**: explain the end-to-end path the implemented change takes through the system. Use a Mermaid diagram where relationships are clearer visually; a short path can be prose. The reader should understand what happens now that did not happen before.
 
 **Form 2 — Per-module table**: one row per module touched, in the chain order:
 
@@ -37,4 +44,4 @@ Close with **Unverified claims** — anything this report states that carries �
 
 ## HTML view
 
-When rendering HTML (artifact or file), load the `artifact-design` skill first, keep the markdown structure 1:1, and pull numbers straight from the markdown source — the moment the HTML drifts from the markdown, the view is lying.
+When rendering an optional HTML view, use an available design skill when relevant, preserve the markdown structure, and pull numbers straight from the source. Do not block reporting on an unavailable external skill.

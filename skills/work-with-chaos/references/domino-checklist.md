@@ -2,7 +2,9 @@
 
 The ordering discipline for ticket sequencing — CHIA–CHỌN–CHUỖI (timvu.vn/fast): among the things worth doing, pick the domino that makes later steps easier to test, easier to change, or unnecessary.
 
-When ordering tickets after `/to-tickets` drafts them, run this checklist top-down. The first rule that discriminates between two tickets decides their order. Record the reason as one line in the ticket's **Domino Note**.
+First honor the plan's execution mode and actual dependencies. Preserve a user-required ordered sequence, validate dependency IDs and cycles, and name the output each dependent task consumes. Do not manufacture a dependency merely to enforce a preferred schedule.
+
+Among equally eligible tasks in **flexible** mode, run this checklist top-down. The first rule that discriminates decides their schedule, never overrides a dependency. Record the reason as one line in the ticket's **Domino Note**. Foundations such as schemas or test harnesses need named consumers; these heuristics do not authorize extra infrastructure.
 
 1. **Unblocks the most** — the ticket that, once done, lets the most other tickets start or get tested goes first.
 2. **Makes later testing easier** — the ticket that creates the seam/harness/fixture the later tickets test through goes before the tickets that use it.

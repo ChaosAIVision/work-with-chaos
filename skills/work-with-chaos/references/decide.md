@@ -10,7 +10,7 @@ Six axes, checked per decision point — **architecture · performance · databa
 
 1. **Collect open axes** from the Decision Report's "Open choices" section. Drop any axis whose choice is already locked (existing ADR, `QUALITY-CONTRACT.md` threshold, standing decision). For each dropped axis, the one-liner above goes in the output so the sweep is visible.
 
-2. **One AskUserQuestion per open axis.** Batch up to four questions in one call (the tool's limit) — the human answers in one pass, clicking, not typing.
+2. **Ask only material open questions.** Use the host's question tool when available and respect its actual limits; otherwise ask plainly. Combine related choices when one answer resolves them. Read repository facts before asking and avoid reopening settled requirements. This decision step is distinct from execution approval.
    - Each option carries its trade-off inline, one line, pulled from the Decision Report — the choice and its price visible together.
    - Where an option's performance case rests on a number, the number appears in the option text *with its ladder label* (🟢/🟡/🔴/⚫). An option pitching "fast" on ⚫ evidence says so.
    - Recommended option first, marked "(Recommended)", when research actually supports one; when the evidence is ⚫ across the board, present the options honestly unranked and say why.
@@ -22,4 +22,4 @@ Six axes, checked per decision point — **architecture · performance · databa
 
 ## Quality Contract
 
-When `QUALITY-CONTRACT.md` doesn't exist yet in the target repo: seed it from the per-stack template ([quality contract template](quality-contract-template.md)), fill concrete thresholds from *labeled* benchmark evidence, then lock it with the human in one AskUserQuestion pass during Deep-Plan. One lock, then the contract judges — during research the thresholds are proposals, and a proposal may never present itself as a verdict.
+Preserve an existing `QUALITY-CONTRACT.md` and apply its relevant thresholds. If the work needs a new measurable performance contract, use the [quality contract template](quality-contract-template.md), ground proposed thresholds in labeled evidence or explicit user requirements, and include them in the plan package for acceptance. Never infer an SLA from a generic stack template. If performance is outside the requested change, record that no new threshold applies; functional acceptance remains mandatory. During research, proposed thresholds cannot present themselves as verdicts.
